@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+
+require 'ya_checker'
+
+module YaChecker
+  class Executable
+
+    def self.execute
+      opts = GetoptLong.new([ '--number', '-n', GetoptLong::OPTIONAL_ARGUMENT ], 
+              [ '--url', '-u', GetoptLong::REQUIRED_ARGUMENT ],
+              [ '--help', '-h', GetoptLong::NO_ARGUMENT ])
+      opts.each do |opt, arg|
+        case opt
+          when '--number'
+            @number = arg.to_i
+          when '--url'
+            @url = arg
+          when '--help'
+            puts help_message
+        end
+      end
+
+      if ARGV.length != 1
+        puts "Missing arguments: url and number (try --help)"
+        exit 0
+      end
+      YaChecker::Processor.new(@url, ARGV, @number).process
+    end
+
+        def self.help_message
+          puts <<-EOF
+DESCRIPTION
+  checker - retrieves search results for keyword from xml.yandex.ru and returns url from particular position.
+
+SYNOPSIS
+  checker [KEYWORD...] [OPTIONS]
+
+  -h, --help:
+     show help
+
+  --number x, -n x:
+     url position number in response
+
+  --url [name]:
+     xml.yandex url
+
+  KEYWORD - words should to be found in yandex search
+      EOF
+    end      
+
+
+  end
+end
+
+Checker::Executable.execute
