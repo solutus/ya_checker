@@ -12,7 +12,7 @@ module YaChecker
       opts.each do |opt, arg|
         case opt
           when '--number'
-            @number = arg.to_i
+            @number = arg.nil? ? 1 : arg.to_i 
           when '--url'
             @url = arg
           when '--help'
@@ -20,20 +20,16 @@ module YaChecker
         end
       end
 
-      if ARGV.length != 1
-        puts "Missing arguments: url and number (try --help)"
-        exit 0
-      end
-      YaChecker::Processor.new(@url, ARGV, @number).process
+      puts YaChecker::Processor.new(@url, ARGV, @number).process
     end
 
         def self.help_message
           puts <<-EOF
 DESCRIPTION
-  checker - retrieves search results for keyword from xml.yandex.ru and returns url from particular position.
+  ya_checker - retrieves search results for keyword from xml.yandex.ru and returns url from particular position.
 
 SYNOPSIS
-  checker [KEYWORD...] [OPTIONS]
+  ya_checker [KEYWORD...] [OPTIONS]
 
   -h, --help:
      show help
@@ -41,7 +37,7 @@ SYNOPSIS
   --number x, -n x:
      url position number in response
 
-  --url [name]:
+  --url "url", -u "url":
      xml.yandex url
 
   KEYWORD - words should to be found in yandex search
@@ -52,4 +48,4 @@ SYNOPSIS
   end
 end
 
-Checker::Executable.execute
+YaChecker::Executable.execute
