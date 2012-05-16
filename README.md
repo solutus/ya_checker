@@ -1,7 +1,7 @@
-#DESCRIPTION
+##DESCRIPTION
   ya_checker - retrieves search results for keyword from xml.yandex.ru and returns url from particular position.
 
-#SYNOPSIS
+##SYNOPSIS
   ya_checker [KEYWORD...] [OPTIONS]
 
   -h, --help:
@@ -15,5 +15,5 @@
 
   KEYWORD - words should to be found in yandex search
 
-# EXAMPLE
+## EXAMPLE
   ya_checker ruby vim -n 2 --url "http://xmlsearch.yandex.ru/xmlsearch?user=USER&key=KEY"
