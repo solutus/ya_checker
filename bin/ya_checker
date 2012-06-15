@@ -20,7 +20,9 @@ module YaChecker
         end
       end
 
-      puts YaChecker::Processor.new(@url, ARGV, @number).process
+      if @url
+        YaChecker::Processor.new(@url, ARGV, @number).process
+      end
     end
 
         def self.help_message

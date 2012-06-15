@@ -1,37 +1,32 @@
-require "ya_checker/version"
-require 'yaml'
 require "em-synchrony"
 require "em-synchrony/em-http"
+require "em-synchrony/fiber_iterator"
 require 'getoptlong'
 require 'nokogiri'
-require 'yaml'
 
 module YaChecker
   class Processor
-    def initialize(url,keywords, number)
+    def initialize(url, keywords, number)
       @url = url
       @number = number
       @keywords = keywords
+      @map = init_map keywords
     end
 
-    def process
-      result = []
+    def process 
       uri = URI.parse @url
+
       EventMachine.synchrony do
-        multi = EventMachine::Synchrony::Multi.new
-        @keywords.each do |keyword|
+        EM::Synchrony::FiberIterator.new(@keywords, @keywords.size).each do |keyword|
           request = EventMachine::HttpRequest.new(uri)
-          multi.add keyword.to_sym, request.apost(:body => xml_request(keyword))
+          response = request.post(:body => xml_request(keyword))
+          parse_results response, keyword
         end
-        
-        puts "simultaneous requests started"
-        responses = multi.perform.responses[:callback]
-        puts "http requests completed"
-        result = responses.map{|keyword, http| [keyword, extract_url(http.response)] }
         EventMachine.stop
       end
-      result
+      @map
     end       
+    
 
     private
       def xml_request keyword
@@ -52,6 +47,25 @@ module YaChecker
         urls[@number - 1]
       end
       
+      def init_map keywords
+        keywords.inject({}){|hash, k| hash[k] = nil; hash}
+      end
+
+      def parse_results response, keyword
+        url = extract_url(response.response)
+        @map[keyword] = url
+        print_results
+      end
+
+      def print_results
+        @map.each do |keyword, url|
+          break if url.nil?
+
+          puts "#{keyword}: #{@map[keyword]}" 
+          @map.delete keyword 
+        end
+      end
+
   end
 end
 
